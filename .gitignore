@@ -1,0 +1,27 @@
+# Environment files
+.env
+
+# Java compiled files
+*.class
+
+# Package files
+*.jar
+*.war
+*.ear
+
+# Maven
+.mvn/wrapper/maven-wrapper.jar
+
+# Gradle
+.gradle/
+build/
+
+# Node (nếu project có frontend)
+node_modules/
+
+# VSCode
+.vscode/
+
+# Local config
+application-local.yml
+application-local.properties
