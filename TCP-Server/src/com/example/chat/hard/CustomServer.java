@@ -1,5 +1,7 @@
 package com.example.chat.hard;
 
+import com.example.util.RespUtil;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -64,7 +66,7 @@ public class CustomServer {
                 if (!key.isValid()) continue;
 
                 if (key.isAcceptable()) {
-                    handleAccept(key);
+                    handleAccept(key, serverChannel);
                 } else if (key.isReadable()) {
                     handleRead(key);
                 } else if (key.isWritable()) {
@@ -74,8 +76,7 @@ public class CustomServer {
         }
     }
 
-    private static void handleAccept(SelectionKey key) throws IOException {
-        ServerSocketChannel serverChannel = (ServerSocketChannel) key.channel();
+    private static void handleAccept(SelectionKey key, ServerSocketChannel serverChannel) throws IOException {
         SocketChannel client = serverChannel.accept();
 
         if (client == null) return;
@@ -91,7 +92,7 @@ public class CustomServer {
     private static void handleRead(SelectionKey key) throws IOException {
         SocketChannel client = (SocketChannel) key.channel();
         ByteBuffer buffer = (ByteBuffer) key.attachment();
-
+        buffer.clear();
         int bytesRead = client.read(buffer);
 
         if (bytesRead == -1) {
@@ -109,7 +110,17 @@ public class CustomServer {
         buffer.get(data);
 
         String message = new String(data);
-        System.out.println("Client says: " + message);
+        System.out.println("Client says: " + RespUtil.decode(data));
+
+        message = RespUtil.decode(data);
+        String[] input = message.split(" ");
+        String command = input[0].toLowerCase();
+
+        if (command.equals("ping")) {
+            String output = new PingCmd().handle(input) + "\r\n";
+            int write = client.write(ByteBuffer.wrap(output.getBytes()));
+            System.out.println("Pong: " + write);
+        }
 
         buffer.clear();
     }

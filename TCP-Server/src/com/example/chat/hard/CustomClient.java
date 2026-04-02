@@ -13,19 +13,15 @@ public class CustomClient {
         String host = "localhost";
         int port = 3000;
 
-        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
         SocketChannel socketChannel = SocketChannel.open(new InetSocketAddress(host, port));
 
         while (true) {
             executorService.submit (() -> {
                 Scanner scanner = new Scanner(System.in);
-                try {
-                    while (true) {
-                        String message = scanner.nextLine();
-                        socketChannel.write(ByteBuffer.wrap(message.getBytes()));
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
+                while (true) {
+                    String message = scanner.nextLine();
+                    socketChannel.write(ByteBuffer.wrap(message.getBytes()));
                 }
             });
 
